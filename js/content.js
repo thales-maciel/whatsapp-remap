@@ -62,14 +62,14 @@ const commands = {
     lockScreen:     new KeyboardEvent('keydown', { key: 'l',         ctrlKey: true,  altKey: true,  shiftKey: false }),
 }
 
-function tryIntoEvent({key, ctrlKey, altKey, shiftKey}) {
+function tryMatch({key, ctrlKey, altKey, shiftKey}) {
     const shortcutKey = `${key.toLowerCase()}:${ctrlKey}:${altKey}:${shiftKey}`
     return commands?.[hashedDefinitions?.[shortcutKey]] 
 }
 
 // Main key event handler
 document.addEventListener('keydown', (event) => {
-    const newEvent = tryIntoEvent(event)
+    const newEvent = tryMatch(event)
     if (newEvent) {
       document.dispatchEvent(newEvent)
       event.preventDefault()

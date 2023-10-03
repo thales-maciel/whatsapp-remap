@@ -69,14 +69,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('container')
   commandKeys.forEach(cmd => container.appendChild(createShortcutForm(cmd)))
 
-  // Load current definitions from storage
+  // Load and set current definitions from storage
   browser.storage.local.get(['definitions']).then((result) => {
     Object.entries(defaultCommands).forEach(([cmd, params]) => {
-      if (result.definitions?.[cmd]) {
-        setValuesForCmd(cmd, result.definitions[cmd])
-      } else {
-        setValuesForCmd(cmd, params)
-      }
+      const { key, ctrl, alt, shift } = result.definitions?.[cmd] || params
+      document.getElementById(`key-${cmd}`).value = key
+      document.getElementById(`ctrl-${cmd}`).checked = ctrl
+      document.getElementById(`alt-${cmd}`).checked = alt
+      document.getElementById(`shift-${cmd}`).checked = shift
     })
   });
 
@@ -85,25 +85,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const definitions = {}
     const hashedDefinitions = {}
     commandKeys.forEach(cmd => {
-      const obj = {
+      const def = {
         key: document.getElementById(`key-${cmd}`).value,
         ctrl: document.getElementById(`ctrl-${cmd}`).checked,
         alt: document.getElementById(`alt-${cmd}`).checked,
         shift: document.getElementById(`shift-${cmd}`).checked,
       }
-      definitions[cmd] = obj
-      const hash = `${obj.key}:${obj.ctrl}:${obj.alt}:${obj.shift}`
+      definitions[cmd] = def
+      const hash = `${def.key}:${def.ctrl}:${def.alt}:${def.shift}`.toLowerCase()
       hashedDefinitions[hash] = cmd
     })
 
-    browser.storage.local.set({definitions, hashedDefinitions});
+    browser.storage.local.set({ definitions, hashedDefinitions });
   });
 });
-
-function setValuesForCmd(command, params) {
-    document.getElementById(`key-${command}`).value = params.key
-    document.getElementById(`ctrl-${command}`).checked = params.ctrl
-    document.getElementById(`alt-${command}`).checked = params.alt
-    document.getElementById(`shift-${command}`).checked = params.shift
-}
 
